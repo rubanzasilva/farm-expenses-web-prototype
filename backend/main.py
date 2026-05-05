@@ -27,6 +27,18 @@ app.include_router(summary.router)
 @app.on_event("startup")
 def on_startup():
     Base.metadata.create_all(bind=engine)
+    from backend.database import SessionLocal
+    db = SessionLocal()
+    try:
+        if db.query(Expense).count() == 0:
+            from backend.seed import SEED_EXPENSES, SEED_INCOME
+            for row in SEED_EXPENSES:
+                db.add(Expense(**row))
+            for row in SEED_INCOME:
+                db.add(Income(**row))
+            db.commit()
+    finally:
+        db.close()
 
 
 @app.post("/api/auth/login", response_model=TokenResponse)
