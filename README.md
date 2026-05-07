@@ -217,9 +217,69 @@ git checkout -b feature/your-feature-name
 
 ### Running tests
 
+The project includes a comprehensive test suite for all backend endpoints.
+
+#### Install test dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+#### Run all tests
+
 ```bash
 pytest
 ```
+
+#### Run with verbose output
+
+```bash
+pytest -v
+```
+
+#### Run specific test file
+
+```bash
+pytest tests/test_auth.py
+pytest tests/test_expenses.py
+pytest tests/test_income.py
+pytest tests/test_summary.py
+```
+
+#### Run specific test
+
+```bash
+pytest tests/test_auth.py::TestAuthentication::test_login_success_admin
+```
+
+#### Generate coverage report
+
+```bash
+pip install pytest-cov
+pytest --cov=backend --cov-report=html
+```
+
+#### Test structure
+
+```
+tests/
+├── __init__.py
+├── conftest.py          # Test fixtures and configuration
+├── test_auth.py         # Authentication and authorization tests
+├── test_expenses.py     # Expense CRUD operation tests
+├── test_income.py       # Income CRUD operation tests
+└── test_summary.py      # Summary/analytics endpoint tests
+```
+
+#### What's tested
+
+- **Authentication**: Login, token generation, invalid credentials
+- **Authorization**: Role-based access control (admin vs viewer)
+- **Expense CRUD**: Create, read, update, delete operations
+- **Income CRUD**: Create, read, update, delete operations
+- **Validation**: Field validation, date format, missing required fields
+- **Filtering**: Date ranges, categories, search queries
+- **Summary**: Aggregations, percentages, financial calculations
 
 ## Contributing
 
