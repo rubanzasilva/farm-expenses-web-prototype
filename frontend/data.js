@@ -53,6 +53,11 @@ window.API = {
     }
     if (!res.ok) {
       const err = await res.json().catch(() => ({ detail: "Request failed" }));
+      // Handle Pydantic validation errors (array of error objects)
+      if (Array.isArray(err.detail)) {
+        const messages = err.detail.map(e => e.msg || JSON.stringify(e)).join(", ");
+        throw new Error(messages);
+      }
       throw new Error(err.detail || "Request failed");
     }
     if (res.status === 204) return null;
