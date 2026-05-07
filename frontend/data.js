@@ -55,7 +55,12 @@ window.API = {
       const err = await res.json().catch(() => ({ detail: "Request failed" }));
       // Handle Pydantic validation errors (array of error objects)
       if (Array.isArray(err.detail)) {
-        const messages = err.detail.map(e => e.msg || JSON.stringify(e)).join(", ");
+        const messages = err.detail.map(e => {
+          // Extract field name from location array (e.g., ['body', 'amount'] -> 'amount')
+          const field = e.loc && e.loc.length > 1 ? e.loc[e.loc.length - 1] : '';
+          const msg = e.msg || 'Invalid value';
+          return field ? `${field}: ${msg}` : msg;
+        }).join(", ");
         throw new Error(messages);
       }
       throw new Error(err.detail || "Request failed");
