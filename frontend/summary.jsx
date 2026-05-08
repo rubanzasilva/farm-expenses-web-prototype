@@ -44,13 +44,8 @@ function SummaryTab({ expenses, income, cashAccounts = [], dateFilter, setDateFi
   const totalInc = inc.reduce((s, x) => s + (x.amount || 0), 0);
   const net = totalInc - totalExp;
 
-  // Calculate all-time net for cash discrepancy (unfiltered)
-  const totalExpAll = expenses.reduce((s, x) => s + (x.amount || 0), 0);
-  const totalIncAll = income.reduce((s, x) => s + (x.amount || 0), 0);
-  const netAll = totalIncAll - totalExpAll;
-
   const totalCash = cashAccounts.reduce((s, acc) => s + (acc.balance || 0), 0);
-  const discrepancy = totalCash - netAll;
+  const discrepancy = totalCash - net;
 
   // Expense by category
   const byCat = useMemo(() => {
@@ -114,7 +109,7 @@ function SummaryTab({ expenses, income, cashAccounts = [], dateFilter, setDateFi
         <KpiTile label="Total Income" value={formatUGX(totalInc, { bare: true })} sub={`${inc.length} ${inc.length === 1 ? "entry" : "entries"} · UGX`} tone="gold" icon={<Icon.TrendUp width="18" height="18"/>}/>
         <KpiTile label="Total Expenses" value={formatUGX(totalExp, { bare: true })} sub={`${exp.length} ${exp.length === 1 ? "entry" : "entries"} · UGX`} tone="green" icon={<Icon.TrendDown width="18" height="18"/>}/>
         <KpiTile label="Net Position" value={formatUGX(net, { bare: true })} sub={net < 0 ? "Operating at a loss · UGX" : "In the black · UGX"} tone={net < 0 ? "red" : "green"} icon={<Icon.Wallet width="18" height="18"/>}/>
-        <KpiTile label="Cash on Hand" value={formatUGX(totalCash, { bare: true })} sub={discrepancy !== 0 ? `${formatUGX(Math.abs(discrepancy), { bare: true })} ${discrepancy > 0 ? "over" : "under"} · UGX` : "Matches net · UGX"} tone={discrepancy === 0 ? "green" : "neutral"} icon={<Icon.Wallet width="18" height="18"/>}/>
+        <KpiTile label="Cash on Hand" value={formatUGX(totalCash, { bare: true })} sub={discrepancy !== 0 ? `${formatUGX(Math.abs(discrepancy), { bare: true })} ${discrepancy > 0 ? "over" : "under"} net · UGX` : "Matches net · UGX"} tone={discrepancy === 0 ? "green" : "neutral"} icon={<Icon.Wallet width="18" height="18"/>}/>
       </div>
 
       {/* Charts */}
