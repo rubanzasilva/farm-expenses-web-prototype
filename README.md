@@ -93,8 +93,14 @@ The application will be available at `http://localhost:8000`
 ### Production Mode
 
 ```bash
+# Build script injects cache-busting version into index.html
+python build.py
+
+# Start the server
 uvicorn backend.main:app --host 0.0.0.0 --port 8000
 ```
+
+**Note:** The `build.py` script automatically runs on Railway deployment via the Procfile. It injects the git commit hash as a version parameter into all script tags to prevent browser caching issues.
 
 ## Project Structure
 
