@@ -175,9 +175,9 @@ function App() {
       <TopBar role={role} email={username} onLogout={() => window.API.logout()}/>
       <SubNav tab={tab} setTab={setTab}/>
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-5 sm:py-7">
-        {head && tab !== "readme" && (
-          <div className="mb-4 sm:mb-5 flex items-end justify-between gap-3">
+      {head && tab !== "readme" && (
+        <div className="sticky top-14 sm:top-[104px] z-20 bg-stone-50/95 backdrop-blur border-b border-stone-200">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 sm:py-4 flex items-end justify-between gap-3">
             <div>
               <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-stone-900">{head.title}</h1>
               <p className="text-sm text-stone-500 mt-0.5">{head.subtitle}</p>
@@ -188,7 +188,10 @@ function App() {
               </Button>
             )}
           </div>
-        )}
+        </div>
+      )}
+
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-5 sm:py-7">
 
         {tab === "expenses" && (
           <div className="space-y-4">
