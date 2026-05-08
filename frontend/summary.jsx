@@ -45,7 +45,6 @@ function SummaryTab({ expenses, income, cashAccounts = [], dateFilter, setDateFi
   const net = totalInc - totalExp;
 
   const totalCash = cashAccounts.reduce((s, acc) => s + (acc.balance || 0), 0);
-  const discrepancy = totalCash - net;
 
   // Expense by category
   const byCat = useMemo(() => {
@@ -109,7 +108,7 @@ function SummaryTab({ expenses, income, cashAccounts = [], dateFilter, setDateFi
         <KpiTile label="Total Income" value={formatUGX(totalInc, { bare: true })} sub={`${inc.length} ${inc.length === 1 ? "entry" : "entries"} · UGX`} tone="gold" icon={<Icon.TrendUp width="18" height="18"/>}/>
         <KpiTile label="Total Expenses" value={formatUGX(totalExp, { bare: true })} sub={`${exp.length} ${exp.length === 1 ? "entry" : "entries"} · UGX`} tone="green" icon={<Icon.TrendDown width="18" height="18"/>}/>
         <KpiTile label="Net Position" value={formatUGX(net, { bare: true })} sub={net < 0 ? "Operating at a loss · UGX" : "In the black · UGX"} tone={net < 0 ? "red" : "green"} icon={<Icon.Wallet width="18" height="18"/>}/>
-        <KpiTile label="Cash on Hand" value={formatUGX(totalCash, { bare: true })} sub={discrepancy !== 0 ? `${formatUGX(Math.abs(discrepancy), { bare: true })} ${discrepancy > 0 ? "over" : "under"} net · UGX` : "Matches net position · UGX"} tone={discrepancy === 0 ? "green" : "neutral"} icon={<Icon.Wallet width="18" height="18"/>}/>
+        <KpiTile label="Cash on Hand" value={formatUGX(totalCash, { bare: true })} sub={`${cashAccounts.length} ${cashAccounts.length === 1 ? "account" : "accounts"} · UGX`} tone="neutral" icon={<Icon.Wallet width="18" height="18"/>}/>
       </div>
 
       {/* Charts */}
