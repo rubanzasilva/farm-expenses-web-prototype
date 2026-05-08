@@ -143,6 +143,7 @@ function SubNav({ tab, setTab }) {
   const tabs = [
     { id: "expenses", label: "Expenses", icon: <Icon.TrendDown width="16" height="16"/> },
     { id: "income",   label: "Income",   icon: <Icon.TrendUp   width="16" height="16"/> },
+    { id: "cash",     label: "Cash",     icon: <Icon.Wallet    width="16" height="16"/> },
     { id: "summary",  label: "Summary",  icon: <Icon.Pie       width="16" height="16"/> },
     { id: "readme",   label: "README",   icon: <Icon.Book      width="16" height="16"/> },
   ];
@@ -166,8 +167,8 @@ function BottomNav({ tab, setTab }) {
   const tabs = [
     { id: "expenses", label: "Expenses", icon: <Icon.TrendDown width="20" height="20"/> },
     { id: "income",   label: "Income",   icon: <Icon.TrendUp   width="20" height="20"/> },
+    { id: "cash",     label: "Cash",     icon: <Icon.Wallet    width="20" height="20"/> },
     { id: "summary",  label: "Summary",  icon: <Icon.Pie       width="20" height="20"/> },
-    { id: "readme",   label: "Guide",    icon: <Icon.Book      width="20" height="20"/> },
   ];
   return (
     <nav className="sm:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-stone-200 pb-[env(safe-area-inset-bottom)]">

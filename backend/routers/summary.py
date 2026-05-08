@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 
 from backend.database import get_db
-from backend.models import Expense, Income
+from backend.models import Expense, Income, CashAccount
 from backend.auth import get_current_user
 from backend.categories import EXPENSE_CATEGORIES, INCOME_SOURCES
 
@@ -54,10 +54,26 @@ def get_summary(
             "pct": (t / total_inc) if total_inc else 0.0,
         })
 
+    # Get cash accounts
+    cash_accounts = db.query(CashAccount).all()
+    total_cash = sum(acc.balance for acc in cash_accounts)
+    cash_by_type = {}
+    for acc in cash_accounts:
+        if acc.account_type not in cash_by_type:
+            cash_by_type[acc.account_type] = []
+        cash_by_type[acc.account_type].append({
+            "id": acc.id,
+            "name": acc.account_name,
+            "balance": acc.balance,
+        })
+
     return {
         "expenses_by_category": expenses_by_category,
         "income_by_source": income_by_source,
         "total_expenses": total_exp,
         "total_income": total_inc,
         "net": total_inc - total_exp,
+        "total_cash": total_cash,
+        "cash_by_type": cash_by_type,
+        "cash_accounts": [{"id": acc.id, "account_type": acc.account_type, "account_name": acc.account_name, "balance": acc.balance} for acc in cash_accounts],
     }

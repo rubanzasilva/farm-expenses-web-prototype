@@ -28,7 +28,7 @@ function KpiTile({ label, value, tone = "neutral", icon, sub }) {
   );
 }
 
-function SummaryTab({ expenses, income, dateFilter, setDateFilter }) {
+function SummaryTab({ expenses, income, cashAccounts = [], dateFilter, setDateFilter }) {
   // Apply date filter. Undated rows are included when no filter is set, excluded otherwise.
   const inRange = (iso) => {
     if (!dateFilter.from && !dateFilter.to) return true;
@@ -43,6 +43,8 @@ function SummaryTab({ expenses, income, dateFilter, setDateFilter }) {
   const totalExp = exp.reduce((s, x) => s + (x.amount || 0), 0);
   const totalInc = inc.reduce((s, x) => s + (x.amount || 0), 0);
   const net = totalInc - totalExp;
+  const totalCash = cashAccounts.reduce((s, acc) => s + (acc.balance || 0), 0);
+  const discrepancy = totalCash - net;
 
   // Expense by category
   const byCat = useMemo(() => {
@@ -102,10 +104,11 @@ function SummaryTab({ expenses, income, dateFilter, setDateFilter }) {
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <KpiTile label="Total Income" value={formatUGX(totalInc, { bare: true })} sub={`${inc.length} ${inc.length === 1 ? "entry" : "entries"} · UGX`} tone="gold" icon={<Icon.TrendUp width="18" height="18"/>}/>
         <KpiTile label="Total Expenses" value={formatUGX(totalExp, { bare: true })} sub={`${exp.length} ${exp.length === 1 ? "entry" : "entries"} · UGX`} tone="green" icon={<Icon.TrendDown width="18" height="18"/>}/>
         <KpiTile label="Net Position" value={formatUGX(net, { bare: true })} sub={net < 0 ? "Operating at a loss · UGX" : "In the black · UGX"} tone={net < 0 ? "red" : "green"} icon={<Icon.Wallet width="18" height="18"/>}/>
+        <KpiTile label="Cash on Hand" value={formatUGX(totalCash, { bare: true })} sub={discrepancy !== 0 ? `${formatUGX(Math.abs(discrepancy), { bare: true })} ${discrepancy > 0 ? "over" : "under"} · UGX` : "Matches net · UGX"} tone={discrepancy === 0 ? "green" : "neutral"} icon={<Icon.Wallet width="18" height="18"/>}/>
       </div>
 
       {/* Charts */}

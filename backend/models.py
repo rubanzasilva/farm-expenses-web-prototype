@@ -25,3 +25,15 @@ class Income(Base):
     amount = Column(Float, nullable=False, default=0)
     notes = Column(String, nullable=False, default="")
     created_at = Column(DateTime, server_default=func.now())
+
+
+class CashAccount(Base):
+    __tablename__ = "cash_accounts"
+
+    id = Column(Integer, primary_key=True, index=True)
+    account_type = Column(String, nullable=False)  # Bank, Mobile Money, Cash
+    account_name = Column(String, nullable=False)
+    balance = Column(Float, nullable=False, default=0)
+    notes = Column(String, nullable=False, default="")
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+    created_at = Column(DateTime, server_default=func.now())

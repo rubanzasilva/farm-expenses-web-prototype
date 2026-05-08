@@ -50,9 +50,9 @@ function RecordsTable({ kind, rows, role, onEdit, onDelete, onView, loading }) {
 
   return (
     <div className="bg-white rounded-xl border border-stone-200 overflow-hidden">
-      <div className="hidden md:block overflow-x-auto">
+      <div className="hidden md:block overflow-x-auto max-h-[calc(100vh-180px)]">
         <table className="w-full text-sm">
-          <thead className="sticky top-0 bg-stone-50/95 backdrop-blur border-b border-stone-200 text-stone-600 text-[12px] uppercase tracking-wider">
+          <thead className="sticky top-0 z-10 bg-stone-50/95 backdrop-blur border-b border-stone-200 text-stone-600 text-[12px] uppercase tracking-wider">
             <tr>
               <th className="px-3 py-2.5 text-left font-medium w-10">#</th>
               <th className="px-3 py-2.5 text-left font-medium">Date</th>

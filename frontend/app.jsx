@@ -38,6 +38,7 @@ function App() {
   // Data — loaded from API
   const [expenses, setExpenses] = useState([]);
   const [income, setIncome] = useState([]);
+  const [cashAccounts, setCashAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
   const toast = useToast();
 
@@ -53,12 +54,14 @@ function App() {
     if (!signedIn) return;
     try {
       setLoading(true);
-      const [exp, inc] = await Promise.all([
+      const [exp, inc, cash] = await Promise.all([
         window.API.getExpenses(filters),
         window.API.getIncome(filters),
+        window.API.getCashAccounts(),
       ]);
       setExpenses((exp || []).map(r => ({ ...r, date: r.entry_date })));
       setIncome((inc || []).map(r => ({ ...r, date: r.entry_date })));
+      setCashAccounts(cash || []);
     } catch (e) {
       toast({ tone: "error", message: e.message });
     } finally {
@@ -112,11 +115,17 @@ function App() {
         } else {
           await window.API.createExpense(record);
         }
-      } else {
+      } else if (kind === "income") {
         if (isUpdate) {
           await window.API.updateIncome(record.id, record);
         } else {
           await window.API.createIncome(record);
+        }
+      } else if (kind === "cash") {
+        if (isUpdate) {
+          await window.API.updateCashAccount(record.id, record);
+        } else {
+          await window.API.createCashAccount(record);
         }
       }
       toast({ tone: "success", message: "Saved" });
@@ -131,8 +140,10 @@ function App() {
     try {
       if (kind === "expense") {
         await window.API.deleteExpense(id);
-      } else {
+      } else if (kind === "income") {
         await window.API.deleteIncome(id);
+      } else if (kind === "cash") {
+        await window.API.deleteCashAccount(id);
       }
       toast({ tone: "success", message: "Deleted" });
       setConfirmDelete(null);
@@ -165,6 +176,7 @@ function App() {
   const headerForTab = {
     expenses: { title: "Expenses", subtitle: "Every shilling out of the farm" },
     income:   { title: "Income",   subtitle: "Sales and other inflows" },
+    cash:     { title: "Cash", subtitle: "Money on hand across all accounts" },
     summary:  { title: "Summary",  subtitle: "Where the farm stands today" },
     readme:   { title: "Guide",    subtitle: "How to keep the books" },
   };
@@ -175,23 +187,13 @@ function App() {
       <TopBar role={role} email={username} onLogout={() => window.API.logout()}/>
       <SubNav tab={tab} setTab={setTab}/>
 
-      {head && tab !== "readme" && (
-        <div className="sticky top-14 sm:top-[104px] z-20 bg-stone-50/95 backdrop-blur border-b border-stone-200">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 sm:py-4 flex items-end justify-between gap-3">
-            <div>
-              <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-stone-900">{head.title}</h1>
-              <p className="text-sm text-stone-500 mt-0.5">{head.subtitle}</p>
-            </div>
-            {role === "admin" && (tab === "expenses" || tab === "income") && (
-              <Button variant="primary" className="hidden sm:inline-flex" onClick={() => setDrawer({ mode: "add", kind: tab === "expenses" ? "expense" : "income" })}>
-                <Icon.Plus width="16" height="16"/> Add {tab === "expenses" ? "expense" : "income"}
-              </Button>
-            )}
-          </div>
-        </div>
-      )}
-
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-5 sm:py-7">
+        {head && tab !== "readme" && (
+          <div className="mb-4 sm:mb-5">
+            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-stone-900">{head.title}</h1>
+            <p className="text-sm text-stone-500 mt-0.5">{head.subtitle}</p>
+          </div>
+        )}
 
         {tab === "expenses" && (
           <div className="space-y-4">
@@ -229,20 +231,31 @@ function App() {
           </div>
         )}
 
+        {tab === "cash" && (
+          <CashTab
+            accounts={cashAccounts}
+            loading={loading}
+            role={role}
+            onAdd={() => setDrawer({ mode: "add", kind: "cash" })}
+            onEdit={(r) => setDrawer({ mode: "edit", kind: "cash", record: r })}
+            onDelete={(r) => setConfirmDelete({ kind: "cash", record: r })}
+          />
+        )}
+
         {tab === "summary" && (
-          <SummaryTab expenses={expenses} income={income} dateFilter={summaryRange} setDateFilter={setSummaryRange}/>
+          <SummaryTab expenses={expenses} income={income} cashAccounts={cashAccounts} dateFilter={summaryRange} setDateFilter={setSummaryRange}/>
         )}
 
         {tab === "readme" && <ReadmeTab/>}
       </main>
 
-      {/* FAB on mobile for admin */}
-      {role === "admin" && (tab === "expenses" || tab === "income") && (
+      {/* FAB for admin */}
+      {role === "admin" && (tab === "expenses" || tab === "income" || tab === "cash") && (
         <button
-          onClick={() => setDrawer({ mode: "add", kind: tab === "expenses" ? "expense" : "income" })}
-          className="sm:hidden fixed right-4 bottom-20 z-30 h-14 w-14 rounded-full bg-[#2E7D32] text-white shadow-lg shadow-emerald-900/20 hover:bg-[#256A29] active:bg-[#1F5A23] flex items-center justify-center"
+          onClick={() => setDrawer({ mode: "add", kind: tab === "expenses" ? "expense" : tab })}
+          className="fixed right-4 bottom-20 sm:right-6 sm:bottom-6 z-30 h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-[#2E7D32] text-white shadow-lg shadow-emerald-900/20 hover:bg-[#256A29] active:bg-[#1F5A23] flex items-center justify-center transition-transform hover:scale-105"
           aria-label="Add">
-          <Icon.Plus width="22" height="22"/>
+          <Icon.Plus className="sm:w-6 sm:h-6" width="22" height="22"/>
         </button>
       )}
 
@@ -290,9 +303,9 @@ function DrawerHost({ drawer, setDrawer, onSave, onDeleteRequest, toast }) {
       open={!!drawer}
       onClose={() => setDrawer(null)}
       title={
-        drawer?.mode === "add"  ? `Add ${drawer.kind}` :
-        drawer?.mode === "edit" ? `Edit ${drawer.kind}` :
-        drawer?.mode === "view" ? `${drawer?.kind === "expense" ? "Expense" : "Income"} details` : ""
+        drawer?.mode === "add"  ? `Add ${drawer.kind === "cash" ? "account" : drawer.kind}` :
+        drawer?.mode === "edit" ? `Edit ${drawer.kind === "cash" ? "account" : drawer.kind}` :
+        drawer?.mode === "view" ? `${drawer?.kind === "expense" ? "Expense" : drawer?.kind === "income" ? "Income" : "Account"} details` : ""
       }
       footer={drawer && drawer.mode !== "view" ? (
         <div className="flex items-center justify-end gap-2">
@@ -302,7 +315,15 @@ function DrawerHost({ drawer, setDrawer, onSave, onDeleteRequest, toast }) {
       ) : null}
     >
       {drawer?.mode === "view" && drawer.record && <RecordDetails kind={drawer.kind} record={drawer.record}/>}
-      {drawer && drawer.mode !== "view" && (
+      {drawer && drawer.mode !== "view" && drawer.kind === "cash" && (
+        <CashAccountForm
+          key={`cash-${drawer.record?.id || "new"}`}
+          initial={drawer.record}
+          formRef={formRef}
+          onDeleteRequest={onDeleteRequest}
+        />
+      )}
+      {drawer && drawer.mode !== "view" && (drawer.kind === "expense" || drawer.kind === "income") && (
         <RecordForm
           key={`${drawer.kind}-${drawer.record?.id || "new"}`}
           kind={drawer.kind}
