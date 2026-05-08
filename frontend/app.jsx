@@ -103,14 +103,17 @@ function App() {
   // CRUD — calls API then refreshes
   const upsert = async (kind, record) => {
     try {
+      // Check if this is an update (has a valid numeric ID) or create (no ID)
+      const isUpdate = record.id && typeof record.id === 'number';
+
       if (kind === "expense") {
-        if (record.id) {
+        if (isUpdate) {
           await window.API.updateExpense(record.id, record);
         } else {
           await window.API.createExpense(record);
         }
       } else {
-        if (record.id) {
+        if (isUpdate) {
           await window.API.updateIncome(record.id, record);
         } else {
           await window.API.createIncome(record);

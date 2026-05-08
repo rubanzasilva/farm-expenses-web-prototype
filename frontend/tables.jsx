@@ -203,15 +203,20 @@ function RecordForm({ kind, initial, formRef, onDeleteRequest }) {
     if (!formRef) return;
     formRef.current = () => {
       if (!date || !description || !category || amount === "") return null;
-      return {
-        ...(initial || {}),
-        id: initial?.id || ("n" + Math.random().toString(36).slice(2, 8)),
+      const numAmount = parseFloat(amount);
+      if (isNaN(numAmount)) return null;
+      const result = {
         date,
-        amount: parseFloat(amount) || 0,
+        amount: numAmount,
         description,
         [isExpense ? "category" : "source"]: category,
         notes,
       };
+      // Only include id if editing an existing record
+      if (initial?.id) {
+        result.id = initial.id;
+      }
+      return result;
     };
   }, [date, amount, description, category, notes, initial, isExpense, formRef]);
 
