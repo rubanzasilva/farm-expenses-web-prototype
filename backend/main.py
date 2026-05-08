@@ -3,12 +3,12 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.database import engine, Base
-from backend.models import Expense, Income  # noqa: F401 - registers models
+from backend.models import Expense, Income, CashAccount  # noqa: F401 - registers models
 from backend.schemas import LoginRequest, TokenResponse
 from backend.auth import authenticate, create_token
 from backend.classifier import classify_expense, classify_income
-from backend.categories import EXPENSE_CATEGORIES, INCOME_SOURCES
-from backend.routers import expenses, income, summary
+from backend.categories import EXPENSE_CATEGORIES, INCOME_SOURCES, ACCOUNT_TYPES
+from backend.routers import expenses, income, summary, cash
 
 app = FastAPI(title="Kisongi Farm Tracker")
 
@@ -22,6 +22,7 @@ app.add_middleware(
 app.include_router(expenses.router)
 app.include_router(income.router)
 app.include_router(summary.router)
+app.include_router(cash.router)
 
 
 @app.on_event("startup")
@@ -53,7 +54,7 @@ def login(body: LoginRequest):
 
 @app.get("/api/categories")
 def get_categories():
-    return {"categories": EXPENSE_CATEGORIES, "sources": INCOME_SOURCES}
+    return {"categories": EXPENSE_CATEGORIES, "sources": INCOME_SOURCES, "account_types": ACCOUNT_TYPES}
 
 
 @app.post("/api/classify")

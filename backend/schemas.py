@@ -50,3 +50,20 @@ class TokenResponse(BaseModel):
     token: str
     role: str
     username: str
+
+
+class CashAccountIn(BaseModel):
+    account_type: str
+    account_name: str
+    balance: float
+    notes: str = ""
+
+
+class CashAccountOut(BaseModel):
+    id: int
+    account_type: str
+    account_name: str
+    balance: float
+    notes: str
+
+    model_config = {"from_attributes": True}

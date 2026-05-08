@@ -12,6 +12,10 @@ window.SOURCES = [
   "Rental", "Grant / Support", "Other",
 ];
 
+window.ACCOUNT_TYPES = [
+  "Bank", "Mobile Money", "Cash on Hand",
+];
+
 window.API = {
   getToken() {
     return localStorage.getItem("kisongi_token");
@@ -173,5 +177,37 @@ window.API = {
       body: JSON.stringify({ text, kind }),
     });
     return data.suggestion;
+  },
+
+  async getCashAccounts() {
+    return this._fetch("/api/cash");
+  },
+
+  async createCashAccount(data) {
+    return this._fetch("/api/cash", {
+      method: "POST",
+      body: JSON.stringify({
+        account_type: data.account_type,
+        account_name: data.account_name,
+        balance: data.balance,
+        notes: data.notes || "",
+      }),
+    });
+  },
+
+  async updateCashAccount(id, data) {
+    return this._fetch(`/api/cash/${id}`, {
+      method: "PUT",
+      body: JSON.stringify({
+        account_type: data.account_type,
+        account_name: data.account_name,
+        balance: data.balance,
+        notes: data.notes || "",
+      }),
+    });
+  },
+
+  async deleteCashAccount(id) {
+    return this._fetch(`/api/cash/${id}`, { method: "DELETE" });
   },
 };

@@ -21,3 +21,9 @@ INCOME_SOURCES = [
     "Grant / Support",
     "Other",
 ]
+
+ACCOUNT_TYPES = [
+    "Bank",
+    "Mobile Money",
+    "Cash on Hand",
+]
