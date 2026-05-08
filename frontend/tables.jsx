@@ -198,6 +198,23 @@ function RecordForm({ kind, initial, formRef, onDeleteRequest }) {
   const [notes, setNotes] = useState(initial?.notes || "");
   const options = isExpense ? window.CATEGORIES : window.SOURCES;
 
+  // Format amount with commas for display
+  const formatAmountDisplay = (val) => {
+    if (!val) return "";
+    const num = val.replace(/,/g, "");
+    if (!/^\d*\.?\d*$/.test(num)) return val;
+    const parts = num.split(".");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return parts.join(".");
+  };
+
+  const handleAmountChange = (e) => {
+    const raw = e.target.value.replace(/,/g, "");
+    if (raw === "" || /^\d*\.?\d*$/.test(raw)) {
+      setAmount(raw);
+    }
+  };
+
   // Expose collect() to parent via ref
   useEffect(() => {
     if (!formRef) return;
@@ -248,8 +265,9 @@ function RecordForm({ kind, initial, formRef, onDeleteRequest }) {
       <div>
         <label className="text-[12px] font-medium text-stone-600 uppercase tracking-wider">Amount (UGX)</label>
         <input
-          type="number" inputMode="numeric" min="0"
-          value={amount} onChange={(e) => setAmount(e.target.value)}
+          type="text" inputMode="numeric"
+          value={formatAmountDisplay(amount)}
+          onChange={handleAmountChange}
           placeholder="0"
           className="mt-1 h-14 w-full rounded-lg border border-stone-200 bg-white px-3 text-2xl font-mono tabular-nums focus:outline-none focus:ring-2 focus:ring-emerald-600/30 focus:border-emerald-600/40"
         />
