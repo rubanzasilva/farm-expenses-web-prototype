@@ -272,8 +272,10 @@ function App() {
             <div className="flex items-start gap-3">
               <div className="h-10 w-10 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center shrink-0"><Icon.Trash width="18" height="18"/></div>
               <div>
-                <h3 className="font-semibold text-stone-900">Delete this {confirmDelete.kind}?</h3>
-                <p className="text-sm text-stone-600 mt-1">"{confirmDelete.record.description}" — {formatUGX(confirmDelete.record.amount)}. This can't be undone.</p>
+                <h3 className="font-semibold text-stone-900">Delete this {confirmDelete.kind === "cash" ? "account" : confirmDelete.kind}?</h3>
+                <p className="text-sm text-stone-600 mt-1">
+                  "{confirmDelete.kind === "cash" ? confirmDelete.record.account_name : confirmDelete.record.description}" — {formatUGX(confirmDelete.kind === "cash" ? confirmDelete.record.balance : confirmDelete.record.amount)}. This can't be undone.
+                </p>
               </div>
             </div>
             <div className="flex justify-end gap-2 mt-5">

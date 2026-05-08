@@ -43,8 +43,14 @@ function SummaryTab({ expenses, income, cashAccounts = [], dateFilter, setDateFi
   const totalExp = exp.reduce((s, x) => s + (x.amount || 0), 0);
   const totalInc = inc.reduce((s, x) => s + (x.amount || 0), 0);
   const net = totalInc - totalExp;
+
+  // Calculate all-time net for cash discrepancy (unfiltered)
+  const totalExpAll = expenses.reduce((s, x) => s + (x.amount || 0), 0);
+  const totalIncAll = income.reduce((s, x) => s + (x.amount || 0), 0);
+  const netAll = totalIncAll - totalExpAll;
+
   const totalCash = cashAccounts.reduce((s, acc) => s + (acc.balance || 0), 0);
-  const discrepancy = totalCash - net;
+  const discrepancy = totalCash - netAll;
 
   // Expense by category
   const byCat = useMemo(() => {
@@ -211,7 +217,8 @@ function BreakdownTable({ title, rows, total, colorKey }) {
       {rows.length === 0 ? (
         <div className="p-6 text-center text-sm text-stone-400">No entries</div>
       ) : (
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
           <thead className="bg-stone-50/50 text-stone-600 text-[11px] uppercase tracking-wider">
             <tr>
               <th className="px-4 py-2 text-left font-medium">{title.includes("category") ? "Category" : "Source"}</th>
@@ -247,10 +254,11 @@ function BreakdownTable({ title, rows, total, colorKey }) {
             <tr className="bg-[#f1f8e9] border-t-2 border-[#2E7D32]/20">
               <td className="px-4 py-2.5 text-[#2E7D32] font-semibold uppercase tracking-wider text-[11px]">Total</td>
               <td className="px-4 py-2.5 text-right font-mono tabular-nums font-bold text-[#2E7D32]">{formatUGX(total, { bare: true })}</td>
-              <td colSpan="2"/>
+              <td colSpan="2"></td>
             </tr>
           </tbody>
         </table>
+        </div>
       )}
     </div>
   );
