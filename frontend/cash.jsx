@@ -58,10 +58,10 @@ function CashTab({ accounts, loading, role, onAdd, onEdit, onDelete }) {
                   </div>
                   {role === "admin" && (
                     <div className="flex items-center gap-1">
-                      <button onClick={() => onEdit(acc)} className="h-8 w-8 inline-flex items-center justify-center rounded-md hover:bg-stone-100 text-stone-600">
+                      <button onClick={() => onEdit(acc)} className="h-8 w-8 inline-flex items-center justify-center rounded-md hover:bg-stone-100 text-stone-600" aria-label="Edit account" title="Edit account">
                         <Icon.Edit width="16" height="16"/>
                       </button>
-                      <button onClick={() => onDelete(acc)} className="h-8 w-8 inline-flex items-center justify-center rounded-md hover:bg-rose-50 text-rose-600">
+                      <button onClick={() => onDelete(acc)} className="h-8 w-8 inline-flex items-center justify-center rounded-md hover:bg-rose-50 text-rose-600" aria-label="Delete account" title="Delete account">
                         <Icon.Trash width="16" height="16"/>
                       </button>
                     </div>

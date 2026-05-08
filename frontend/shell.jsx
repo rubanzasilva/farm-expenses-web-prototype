@@ -169,10 +169,11 @@ function BottomNav({ tab, setTab }) {
     { id: "income",   label: "Income",   icon: <Icon.TrendUp   width="20" height="20"/> },
     { id: "cash",     label: "Cash",     icon: <Icon.Wallet    width="20" height="20"/> },
     { id: "summary",  label: "Summary",  icon: <Icon.Pie       width="20" height="20"/> },
+    { id: "readme",   label: "Guide",    icon: <Icon.Book      width="20" height="20"/> },
   ];
   return (
     <nav className="sm:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-stone-200 pb-[env(safe-area-inset-bottom)]">
-      <div className="grid grid-cols-4 h-14">
+      <div className="grid grid-cols-5 h-14">
         {tabs.map(t => (
           <button key={t.id} onClick={() => setTab(t.id)} className={cls(
             "inline-flex flex-col items-center justify-center gap-0.5 text-[10px] uppercase tracking-wider transition-colors",
