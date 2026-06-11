@@ -171,6 +171,32 @@ window.API = {
     return this._fetch("/api/summary");
   },
 
+  // Download an export file (CSV/JSON). Fetches with auth, then triggers a
+  // browser download — a plain <a href> can't send the Authorization header.
+  async downloadExport(dataset, format = "csv") {
+    const token = this.getToken();
+    const res = await fetch(`/api/export/${dataset}?format=${format}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    if (res.status === 401) { this.clearAuth(); window.location.reload(); return; }
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: "Export failed" }));
+      throw new Error(err.detail || "Export failed");
+    }
+    const blob = await res.blob();
+    const disposition = res.headers.get("Content-Disposition") || "";
+    const match = disposition.match(/filename="?([^"]+)"?/);
+    const filename = match ? match[1] : `farm-${dataset}.${format}`;
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  },
+
   async classify(text, kind) {
     const data = await this._fetch("/api/classify", {
       method: "POST",
