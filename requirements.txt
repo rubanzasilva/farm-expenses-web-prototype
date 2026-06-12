@@ -5,6 +5,7 @@ psycopg2-binary>=2.9
 pydantic>=2.0
 PyJWT>=2.8
 python-multipart>=0.0.9
+anthropic[bedrock]>=0.40
 
 # Testing dependencies
 pytest>=8.0.0

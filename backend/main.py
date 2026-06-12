@@ -8,7 +8,7 @@ from backend.schemas import LoginRequest, TokenResponse
 from backend.auth import authenticate, create_token
 from backend.classifier import classify_expense, classify_income
 from backend.categories import EXPENSE_CATEGORIES, INCOME_SOURCES, ACCOUNT_TYPES
-from backend.routers import expenses, income, summary, cash, export
+from backend.routers import expenses, income, summary, cash, export, ingest
 
 app = FastAPI(title="Kisongi Farm Tracker")
 
@@ -24,6 +24,7 @@ app.include_router(income.router)
 app.include_router(summary.router)
 app.include_router(cash.router)
 app.include_router(export.router)
+app.include_router(ingest.router)
 
 
 @app.on_event("startup")
