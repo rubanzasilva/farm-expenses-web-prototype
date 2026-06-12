@@ -105,7 +105,7 @@ function SummaryTab({ expenses, income, cashAccounts = [], dateFilter, setDateFi
       </div>
 
       {/* Export / backup */}
-      {API.getRole() === "admin" && <ExportBar/>}
+      {API.getRole() === "admin" && <ExportBar expenses={expenses} income={income} cashAccounts={cashAccounts} range={dateFilter}/>}
 
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -186,7 +186,7 @@ function SummaryTab({ expenses, income, cashAccounts = [], dateFilter, setDateFi
   );
 }
 
-function ExportBar() {
+function ExportBar({ expenses, income, cashAccounts, range }) {
   const [busy, setBusy] = useState("");
   const [err, setErr] = useState("");
 
@@ -220,8 +220,17 @@ function ExportBar() {
     );
   };
 
+  const PrintBtn = ({ onClick, label }) => (
+    <button
+      onClick={onClick}
+      className="px-3 py-1.5 text-[12px] rounded-lg border whitespace-nowrap transition bg-[#f1f8e9] text-[#2E7D32] border-emerald-200 hover:border-[#2E7D32]"
+    >
+      {label}
+    </button>
+  );
+
   return (
-    <div className="bg-white rounded-xl border border-stone-200 p-3 sm:p-4">
+    <div className="bg-white rounded-xl border border-stone-200 p-3 sm:p-4 space-y-2">
       <div className="flex flex-col sm:flex-row sm:items-center gap-3">
         <div className="text-[12px] uppercase tracking-wider text-stone-500 font-medium whitespace-nowrap">Export / backup</div>
         <div className="flex flex-wrap gap-2 flex-1">
@@ -231,7 +240,14 @@ function ExportBar() {
           <Btn dataset="all" format="json" label="Full backup (JSON)"/>
         </div>
       </div>
-      {err && <div className="mt-2 text-[12px] text-rose-600">{err}</div>}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+        <div className="text-[12px] uppercase tracking-wider text-stone-500 font-medium whitespace-nowrap">Reports (PDF)</div>
+        <div className="flex flex-wrap gap-2 flex-1">
+          <PrintBtn label="Summary report" onClick={() => PrintReport.printSummaryReport({ expenses, income, cashAccounts, range })}/>
+          <PrintBtn label="Data tables" onClick={() => PrintReport.printDataTables({ expenses, income, range })}/>
+        </div>
+      </div>
+      {err && <div className="text-[12px] text-rose-600">{err}</div>}
     </div>
   );
 }
