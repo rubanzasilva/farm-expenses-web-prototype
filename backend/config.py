@@ -6,3 +6,7 @@ ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "admin")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin123")
 VIEWER_USERNAME = os.environ.get("VIEWER_USERNAME", "viewer")
 VIEWER_PASSWORD = os.environ.get("VIEWER_PASSWORD", "viewer123")
+
+# Shared secret for the chat-ingest webhook (Discord/Telegram bot -> /api/ingest).
+# If unset, the ingest endpoint is disabled (returns 503).
+INGEST_SECRET = os.environ.get("INGEST_SECRET", "")

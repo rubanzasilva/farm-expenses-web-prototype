@@ -11,10 +11,12 @@ from pathlib import Path
 
 def get_git_hash():
     """Get short git commit hash, with stable fallbacks."""
-    # Try environment variable first (Railway provides RAILWAY_GIT_COMMIT_SHA)
-    env_commit = os.environ.get("RAILWAY_GIT_COMMIT_SHA")
-    if env_commit:
-        return env_commit[:7]  # Short hash like git --short
+    # Try environment variable first. Different platforms expose the commit
+    # SHA under different names (Railway, Koyeb, generic CI).
+    for var in ("RAILWAY_GIT_COMMIT_SHA", "KOYEB_GIT_SHA", "GIT_COMMIT_SHA"):
+        env_commit = os.environ.get(var)
+        if env_commit:
+            return env_commit[:7]  # Short hash like git --short
 
     # Try git command
     try:

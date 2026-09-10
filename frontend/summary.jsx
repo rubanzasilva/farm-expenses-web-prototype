@@ -104,6 +104,9 @@ function SummaryTab({ expenses, income, cashAccounts = [], dateFilter, setDateFi
         <button onClick={() => setDateFilter({})} className="text-sm text-stone-500 hover:text-[#2E7D32] hover:underline whitespace-nowrap">Clear</button>
       </div>
 
+      {/* Export / backup */}
+      {API.getRole() === "admin" && <ExportBar expenses={expenses} income={income} cashAccounts={cashAccounts} range={dateFilter}/>}
+
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <KpiTile label="Total Income" value={formatUGX(totalInc, { bare: true })} sub={`${inc.length} ${inc.length === 1 ? "entry" : "entries"} · UGX`} tone="gold" icon={<Icon.TrendUp width="18" height="18"/>}/>
@@ -179,6 +182,72 @@ function SummaryTab({ expenses, income, cashAccounts = [], dateFilter, setDateFi
         <BreakdownTable title="Expenses by category" rows={byCat} total={totalExp} colorKey/>
         <BreakdownTable title="Income by source" rows={bySrc} total={totalInc} colorKey/>
       </div>
+    </div>
+  );
+}
+
+function ExportBar({ expenses, income, cashAccounts, range }) {
+  const [busy, setBusy] = useState("");
+  const [err, setErr] = useState("");
+
+  const download = async (dataset, format) => {
+    setErr("");
+    setBusy(`${dataset}-${format}`);
+    try {
+      await API.downloadExport(dataset, format);
+    } catch (e) {
+      setErr(e.message || "Export failed");
+    } finally {
+      setBusy("");
+    }
+  };
+
+  const Btn = ({ dataset, format, label }) => {
+    const key = `${dataset}-${format}`;
+    return (
+      <button
+        onClick={() => download(dataset, format)}
+        disabled={!!busy}
+        className={cls(
+          "px-3 py-1.5 text-[12px] rounded-lg border whitespace-nowrap transition",
+          busy === key
+            ? "bg-stone-100 text-stone-400 border-stone-200"
+            : "bg-white text-stone-700 border-stone-200 hover:border-[#2E7D32] hover:text-[#2E7D32]"
+        )}
+      >
+        {busy === key ? "…" : label}
+      </button>
+    );
+  };
+
+  const PrintBtn = ({ onClick, label }) => (
+    <button
+      onClick={onClick}
+      className="px-3 py-1.5 text-[12px] rounded-lg border whitespace-nowrap transition bg-[#f1f8e9] text-[#2E7D32] border-emerald-200 hover:border-[#2E7D32]"
+    >
+      {label}
+    </button>
+  );
+
+  return (
+    <div className="bg-white rounded-xl border border-stone-200 p-3 sm:p-4 space-y-2">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+        <div className="text-[12px] uppercase tracking-wider text-stone-500 font-medium whitespace-nowrap">Export / backup</div>
+        <div className="flex flex-wrap gap-2 flex-1">
+          <Btn dataset="expenses" format="csv" label="Expenses CSV"/>
+          <Btn dataset="income" format="csv" label="Income CSV"/>
+          <Btn dataset="cash" format="csv" label="Cash CSV"/>
+          <Btn dataset="all" format="json" label="Full backup (JSON)"/>
+        </div>
+      </div>
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+        <div className="text-[12px] uppercase tracking-wider text-stone-500 font-medium whitespace-nowrap">Reports (PDF)</div>
+        <div className="flex flex-wrap gap-2 flex-1">
+          <PrintBtn label="Summary report" onClick={() => PrintReport.printSummaryReport({ expenses, income, cashAccounts, range })}/>
+          <PrintBtn label="Data tables" onClick={() => PrintReport.printDataTables({ expenses, income, range })}/>
+        </div>
+      </div>
+      {err && <div className="text-[12px] text-rose-600">{err}</div>}
     </div>
   );
 }
