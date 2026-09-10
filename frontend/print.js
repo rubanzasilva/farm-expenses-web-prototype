@@ -116,12 +116,13 @@
         return `<tr><td>${esc(r.name)}</td><td class="num">${fmt(r.total)}</td>
                 <td class="num">${r.count}</td><td class="num">${pct}%</td></tr>`;
       }).join("");
+      const entries = bd.rows.reduce((s, r) => s + (r.count || 0), 0);
       return `<h2>${esc(title)}</h2><table>
         <thead><tr><th>${esc(keyHead)}</th><th class="num">Total (UGX)</th>
           <th class="num">Entries</th><th class="num">% of total</th></tr></thead>
         <tbody>${body}
           <tr class="total"><td>Total</td><td class="num">${fmt(bd.total)}</td>
-            <td class="num">${exp.length || ""}</td><td></td></tr>
+            <td class="num">${entries || ""}</td><td></td></tr>
         </tbody></table>`;
     };
 
